@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class UsersPage extends StatefulWidget {
   @override
@@ -9,6 +12,18 @@ class _UsersPageState extends State<UsersPage> {
   late String query;
   bool notVisible = false;
   TextEditingController querryTextEditingController = TextEditingController();
+  dynamic data;
+
+  void _search(String query) {
+    String url = 'https://api.github.com/search/users?q=${query}&per_page=20&page=0';
+    http.get(url as Uri).then((response){
+          setState(() {
+            this.data = json.decode(response.body);
+          });
+    }).catchError((error){
+          print(error);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,6 +68,7 @@ class _UsersPageState extends State<UsersPage> {
               IconButton(onPressed: (){
                 setState(() {
                   this.query = querryTextEditingController.text;
+                  _search(query);
                 });
 
               }, icon: Icon(Icons.search, color: Colors.green,))
@@ -62,4 +78,6 @@ class _UsersPageState extends State<UsersPage> {
       )
     );
   }
+
+
 }
